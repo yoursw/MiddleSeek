@@ -11,6 +11,7 @@ import {
   AccessibilityInfo,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Markdown from 'react-native-markdown-display';
 import { Message } from '../types/chat';
 import { TypingIndicator } from './TypingIndicator';
 import { MessageReactions } from './MessageReactions';
@@ -61,12 +62,31 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         accessibilityLabel={`${isUser ? 'You' : 'Bot'} said: ${item.text}`}
         accessibilityRole="text"
       >
-        <Text style={[
-          styles.messageText,
-          isUser ? styles.userMessageText : styles.botMessageText
-        ]}>
+        <Markdown
+          style={{
+            body: {
+              ...styles.messageText,
+              ...(isUser ? styles.userMessageText : styles.botMessageText),
+            },
+            code_inline: {
+              backgroundColor: isUser ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+              padding: 4,
+              borderRadius: 4,
+            },
+            code_block: {
+              backgroundColor: isUser ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+              padding: 8,
+              borderRadius: 4,
+              marginVertical: 8,
+            },
+            link: {
+              color: isUser ? '#fff' : '#007AFF',
+              textDecorationLine: 'underline',
+            },
+          }}
+        >
           {item.text}
-        </Text>
+        </Markdown>
         <View style={styles.messageFooter}>
           <Text style={[
             styles.timestamp,
@@ -83,6 +103,18 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         )}
       </View>
     );
+  };
+
+  const handleKeyPress = (e: any) => {
+    if (Platform.OS === 'web') {
+      if (e.key === 'Enter' && !e.ctrlKey) {
+        e.preventDefault();
+        handleSend();
+      } else if (e.key === 'Enter' && e.ctrlKey) {
+        // Allow default behavior (new line) when Ctrl+Enter is pressed
+        return;
+      }
+    }
   };
 
   return (
@@ -113,10 +145,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           onChangeText={setInputText}
           placeholder="Type your message..."
           multiline
+          onKeyPress={handleKeyPress}
           onSubmitEditing={handleSend}
           accessible={true}
           accessibilityLabel="Message input field"
-          accessibilityHint="Type your message and press send"
+          accessibilityHint="Type your message and press send. Press Ctrl+Enter for a new line."
         />
         <TouchableOpacity
           style={[styles.sendButton, isLoading && styles.sendButtonDisabled]}
