@@ -36,3 +36,61 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+.vercel
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Build files
+web-build/
+dist/
+build/
+*.tsbuildinfo
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Testing
+coverage/
+
+# Security
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+*.der
+*.p7b
+*.p7c
+*.p7m
+*.p7s
+*.p8
+*.p10
+*.p12
+*.pfx
+*.pem
+*.key
+*.gpg
+*.asc
+*.sig
+*.pgp
+*.pass
+*.secret
+*.token
+*.auth
+*.cred
+*.credential
+*.credentials
+*.keyring
+*.keystore
+*.jks
+*.jceks
