@@ -14,7 +14,8 @@ export default function App() {
   const [chatService] = React.useState(() => {
     return new ChatService({
       provider: 'openrouter',
-      model: 'openai/gpt-3.5-turbo',
+      model: 'deepseek/deepseek-chat-v3-0324',
+      // model: 'deepseek/deepseek-chat-v3-0324:free',
       apiKey: process.env.EXPO_PUBLIC_OPENROUTER_API_KEY || '',
     });
   });
