@@ -1,20 +1,23 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ChatInterface } from './components/ChatInterface';
+import { CellIdentifier } from './components/CellIdentifier';
 import { ChatService } from './services/ChatService';
 import { Message } from './types/chat';
 
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
-export default function App() {
+const ChatScreen = () => {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [chatService] = React.useState(() => {
     return new ChatService({
       provider: 'openrouter',
-      model: 'openai/gpt-3.5-turbo',
+      model: 'deepseek/deepseek-chat-v3-0324',
+      // model: 'deepseek/deepseek-chat-v3-0324:free',
       apiKey: process.env.EXPO_PUBLIC_OPENROUTER_API_KEY || '',
     });
   });
@@ -82,25 +85,52 @@ export default function App() {
   };
 
   return (
+    <>
+      <StatusBar style="auto" />
+      <ChatInterface
+        messages={messages}
+        onSendMessage={handleSendMessage}
+        isLoading={isLoading}
+        onReact={handleReaction}
+      />
+    </>
+  );
+};
+
+export default function App() {
+  return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen 
-          name="Chat" 
-          options={{ headerShown: false }}
-        >
-          {() => (
-            <>
-              <StatusBar style="auto" />
-              <ChatInterface
-                messages={messages}
-                onSendMessage={handleSendMessage}
-                isLoading={isLoading}
-                onReact={handleReaction}
-              />
-            </>
-          )}
-        </Stack.Screen>
-      </Stack.Navigator>
+      <Tab.Navigator
+        screenOptions={{
+          tabBarActiveTintColor: '#2196F3',
+          tabBarInactiveTintColor: '#666',
+          tabBarStyle: {
+            paddingBottom: 5,
+            paddingTop: 5,
+          },
+        }}
+      >
+        <Tab.Screen
+          name="Chat"
+          component={ChatScreen}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="chat" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Cell Identifier"
+          component={CellIdentifier}
+          options={{
+            headerShown: true,
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="microscope" size={size} color={color} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
     </NavigationContainer>
   );
 }
