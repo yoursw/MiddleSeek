@@ -1,90 +1,93 @@
-import React, { useEffect } from 'react';
-import { View, Animated, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
 
 interface TypingIndicatorProps {
   isVisible: boolean;
 }
 
 export const TypingIndicator: React.FC<TypingIndicatorProps> = ({ isVisible }) => {
-  const animations = [
-    React.useRef(new Animated.Value(0)).current,
-    React.useRef(new Animated.Value(0)).current,
-    React.useRef(new Animated.Value(0)).current,
-  ];
+  const [dots] = React.useState(new Animated.Value(0));
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (isVisible) {
-      const sequence = animations.map((animation, index) => {
-        return Animated.sequence([
-          Animated.delay(index * 200),
-          Animated.loop(
-            Animated.sequence([
-              Animated.timing(animation, {
-                toValue: 1,
-                duration: 400,
-                useNativeDriver: true,
-              }),
-              Animated.timing(animation, {
-                toValue: 0,
-                duration: 400,
-                useNativeDriver: true,
-              }),
-            ])
-          ),
-        ]);
-      });
-
-      Animated.parallel(sequence).start();
-    } else {
-      animations.forEach(animation => {
-        animation.stopAnimation();
-        animation.setValue(0);
-      });
+      const animation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(dots, {
+            toValue: 1,
+            duration: 1000,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+          Animated.timing(dots, {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+      animation.start();
+      return () => animation.stop();
     }
-  }, [isVisible]);
+  }, [isVisible, dots]);
 
   if (!isVisible) return null;
 
+  const opacity1 = dots.interpolate({
+    inputRange: [0, 0.25, 0.5, 0.75, 1],
+    outputRange: [0, 1, 1, 1, 0],
+  });
+
+  const opacity2 = dots.interpolate({
+    inputRange: [0, 0.25, 0.5, 0.75, 1],
+    outputRange: [0, 0, 1, 1, 0],
+  });
+
+  const opacity3 = dots.interpolate({
+    inputRange: [0, 0.25, 0.5, 0.75, 1],
+    outputRange: [0, 0, 0, 1, 0],
+  });
+
   return (
     <View style={styles.container}>
-      {animations.map((animation, index) => (
-        <Animated.View
-          key={index}
-          style={[
-            styles.dot,
-            {
-              transform: [
-                {
-                  translateY: animation.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, -6],
-                  }),
-                },
-              ],
-            },
-          ]}
-        />
-      ))}
+      <View style={styles.bubble}>
+        <Text style={styles.text}>Bot is typing</Text>
+        <View style={styles.dotsContainer}>
+          <Animated.View style={[styles.dot, { opacity: opacity1 }]} />
+          <Animated.View style={[styles.dot, { opacity: opacity2 }]} />
+          <Animated.View style={[styles.dot, { opacity: opacity3 }]} />
+        </View>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    padding: 8,
+    alignItems: 'flex-start',
+  },
+  bubble: {
+    backgroundColor: '#E5E5EA',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    borderRadius: 20,
-    backgroundColor: '#E5E5EA',
-    alignSelf: 'flex-start',
-    marginVertical: 8,
-    marginLeft: 16,
+  },
+  text: {
+    color: '#000',
+    fontSize: 14,
+    marginRight: 4,
+  },
+  dotsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#666',
-    marginHorizontal: 2,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#000',
+    marginHorizontal: 1,
   },
 }); 

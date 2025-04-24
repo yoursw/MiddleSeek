@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, StatusBar } from 'react-native';
-import { ChatInterface } from '../../components/ChatInterface';
-import { ChatService } from '../../services/ChatService';
-import { Message } from '../../types/chat';
+import { ChatInterface } from '../components/ChatInterface';
+import { ChatService } from '../services/ChatService';
+import { Message } from '../types/chat';
 
 const OPENROUTER_API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY || '';
 
-export default function ChatScreen() {
+export default function Index() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [chatService] = useState(() => {
@@ -57,6 +57,7 @@ export default function ChatScreen() {
         text: response,
         sender: 'bot',
         timestamp: new Date(),
+        reactions: {},
       };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
@@ -66,6 +67,24 @@ export default function ChatScreen() {
     }
   };
 
+  const handleReaction = (messageId: string, reactionType: string) => {
+    setMessages((prev) =>
+      prev.map((msg) => {
+        if (msg.id === messageId) {
+          const reactions = msg.reactions || {};
+          return {
+            ...msg,
+            reactions: {
+              ...reactions,
+              [reactionType]: (reactions[reactionType] || 0) + 1,
+            },
+          };
+        }
+        return msg;
+      }),
+    );
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -73,6 +92,7 @@ export default function ChatScreen() {
         messages={messages}
         onSendMessage={handleSendMessage}
         isLoading={isLoading}
+        onReact={handleReaction}
       />
     </View>
   );
@@ -84,4 +104,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingTop: StatusBar.currentHeight,
   },
-}); 
+});

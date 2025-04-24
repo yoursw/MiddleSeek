@@ -11,10 +11,9 @@ import {
   AccessibilityInfo,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { TypingIndicator } from './TypingIndicator';
-import { MessageStatus } from './MessageStatus';
-import { MessageReactions } from './MessageReactions';
 import { Message } from '../types/chat';
+import { TypingIndicator } from './TypingIndicator';
+import { MessageReactions } from './MessageReactions';
 
 interface ChatInterfaceProps {
   onSendMessage: (message: string) => Promise<void>;
@@ -75,9 +74,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           ]}>
             {item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </Text>
-          {isUser && item.status && (
-            <MessageStatus status={item.status} />
-          )}
         </View>
         {!isUser && onReact && (
           <MessageReactions
