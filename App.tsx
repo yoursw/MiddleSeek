@@ -8,16 +8,35 @@ import { Message } from './types/chat';
 
 const Stack = createNativeStackNavigator();
 
+const OPENROUTER_API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY || '';
+const LANGSMITH_API_KEY = process.env.EXPO_PUBLIC_LANGSMITH_API_KEY || '';
+const LANGSMITH_API_URL = process.env.EXPO_PUBLIC_LANGSMITH_API_URL || 'https://api.smith.langchain.com';
+
 export default function App() {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [chatService] = React.useState(() => {
-    return new ChatService({
+    console.log('Initializing ChatService with config:', {
       provider: 'openrouter',
       model: 'deepseek/deepseek-chat-v3-0324',
-      // model: 'deepseek/deepseek-chat-v3-0324:free',
-      apiKey: process.env.EXPO_PUBLIC_OPENROUTER_API_KEY || '',
+      apiKey: OPENROUTER_API_KEY ? '***' : 'missing',
+      langsmith: {
+        apiKey: LANGSMITH_API_KEY ? '***' : 'missing',
+        apiUrl: LANGSMITH_API_URL,
+      },
     });
+    return new ChatService(
+      {
+        provider: 'openrouter',
+        model: 'deepseek/deepseek-chat-v3-0324',
+        // model: 'deepseek/deepseek-chat-v3-0324:free',
+        apiKey: OPENROUTER_API_KEY,
+      },
+      {
+        apiKey: LANGSMITH_API_KEY,
+        apiUrl: LANGSMITH_API_URL,
+      }
+    );
   });
 
   React.useEffect(() => {
