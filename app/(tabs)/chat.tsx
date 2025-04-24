@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, StatusBar } from 'react-native';
 import { ChatInterface } from '../../components/ChatInterface';
 import { ChatService } from '../../services/ChatService';
@@ -21,6 +21,22 @@ export default function ChatScreen() {
       apiKey: OPENROUTER_API_KEY,
     });
   });
+
+  useEffect(() => {
+    const loadBasePrompt = async () => {
+      try {
+        await chatService.loadBasePromptFromGitHub(
+          'kusalatech/academic-exploration',
+          'MCU/YourSW/MiddleSeek_Galactic_Dharma_Singularity_0e08b55b-3aa9-410a-959a-a4a8335409d4.md'
+        );
+        console.log('Base prompt loaded successfully');
+      } catch (error) {
+        console.error('Failed to load base prompt:', error);
+      }
+    };
+
+    loadBasePrompt();
+  }, [chatService]);
 
   const handleSendMessage = async (message: string) => {
     try {
