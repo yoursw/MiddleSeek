@@ -27,7 +27,7 @@ export default function ChatScreen() {
       try {
         await chatService.loadBasePromptFromGitHub(
           'kusalatech/academic-exploration',
-          'MCU/YourSW/MiddleSeek_Galactic_Dharma_Singularity_0e08b55b-3aa9-410a-959a-a4a8335409d4.md'
+          'MCU/YourSW/MiddleSeek_Galactic_Dharma_Singularity_0e08b55b-3aa9-410a-959a-a4a8335409d4.md',
         );
         console.log('Base prompt loaded successfully');
       } catch (error) {
@@ -48,14 +48,16 @@ export default function ChatScreen() {
         timestamp: new Date(),
         status: 'sending',
       };
-      setMessages(prev => [...prev, newMessage]);
+      setMessages((prev) => [...prev, newMessage]);
 
       const response = await chatService.sendMessage(message);
-      
+
       // Update user message status to 'sent'
-      setMessages(prev => prev.map(msg => 
-        msg.id === newMessage.id ? { ...msg, status: 'sent' } : msg
-      ));
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === newMessage.id ? { ...msg, status: 'sent' } : msg,
+        ),
+      );
 
       // Add bot response
       const botMessage: Message = {
@@ -64,48 +66,55 @@ export default function ChatScreen() {
         sender: 'bot',
         timestamp: new Date(),
       };
-      setMessages(prev => [...prev, botMessage]);
+      setMessages((prev) => [...prev, botMessage]);
 
       // Update user message status to 'delivered'
       setTimeout(() => {
-        setMessages(prev => prev.map(msg =>
-          msg.id === newMessage.id ? { ...msg, status: 'delivered' } : msg
-        ));
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === newMessage.id ? { ...msg, status: 'delivered' } : msg,
+          ),
+        );
       }, 500);
 
       // Update user message status to 'read'
       setTimeout(() => {
-        setMessages(prev => prev.map(msg =>
-          msg.id === newMessage.id ? { ...msg, status: 'read' } : msg
-        ));
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === newMessage.id ? { ...msg, status: 'read' } : msg,
+          ),
+        );
       }, 1000);
-
     } catch (error) {
       console.error('Error sending message:', error);
-      setMessages(prev => prev.map(msg =>
-        msg.sender === 'user' && msg.status === 'sending'
-          ? { ...msg, status: 'error' }
-          : msg
-      ));
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.sender === 'user' && msg.status === 'sending'
+            ? { ...msg, status: 'error' }
+            : msg,
+        ),
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleReaction = (messageId: string, reactionType: string) => {
-    setMessages(prev => prev.map(msg => {
-      if (msg.id === messageId) {
-        const reactions = msg.reactions || {};
-        return {
-          ...msg,
-          reactions: {
-            ...reactions,
-            [reactionType]: (reactions[reactionType] || 0) + 1,
-          },
-        };
-      }
-      return msg;
-    }));
+    setMessages((prev) =>
+      prev.map((msg) => {
+        if (msg.id === messageId) {
+          const reactions = msg.reactions || {};
+          return {
+            ...msg,
+            reactions: {
+              ...reactions,
+              [reactionType]: (reactions[reactionType] || 0) + 1,
+            },
+          };
+        }
+        return msg;
+      }),
+    );
   };
 
   console.log('Current messages:', messages);
