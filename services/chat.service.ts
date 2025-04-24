@@ -84,7 +84,7 @@ export class ChatService {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
-          'HTTP-Referer': 'http://localhost:3000',
+          'HTTP-Referer': 'https://app.middleseek.org',
           'X-Title': 'Middleseek',
         },
         body: JSON.stringify({
@@ -104,7 +104,17 @@ export class ChatService {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('OpenRouter API error:', errorData);
+        console.error('OpenRouter API error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+          requestConfig: {
+            model,
+            textLength: text.length,
+            temperature,
+            maxTokens,
+          }
+        });
         throw new Error(`OpenRouter API error: ${errorData.message || response.statusText}`);
       }
 
