@@ -9,6 +9,9 @@ import {
   Platform,
   Text,
   AccessibilityInfo,
+  Clipboard,
+  ToastAndroid,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
@@ -62,6 +65,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         accessibilityLabel={`${isUser ? 'You' : 'Bot'} said: ${item.text}`}
         accessibilityRole="text"
       >
+        <View style={styles.messageHeader}>
+          <TouchableOpacity 
+            style={styles.copyButton}
+            onPress={() => handleCopyText(item.text)}
+            accessible={true}
+            accessibilityLabel="Copy message"
+            accessibilityHint="Double tap to copy this message to clipboard"
+          >
+            <Ionicons name="copy-outline" size={16} color={isUser ? "#fff" : "#666"} />
+          </TouchableOpacity>
+        </View>
         <Markdown
           style={{
             body: {
@@ -115,6 +129,22 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         return;
       }
     }
+  };
+
+  const handleCopyText = (text: string) => {
+    Clipboard.setString(text);
+    
+    // Show confirmation based on platform
+    if (Platform.OS === 'android') {
+      ToastAndroid.show('Message copied to clipboard', ToastAndroid.SHORT);
+    } else if (Platform.OS === 'ios') {
+      Alert.alert('Copied', 'Message copied to clipboard');
+    } else {
+      // For web or other platforms
+      console.log('Message copied to clipboard');
+    }
+    
+    AccessibilityInfo.announceForAccessibility('Message copied to clipboard');
   };
 
   return (
@@ -175,6 +205,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingTop: 16,
+  },
+  messageHeader: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 4,
+  },
+  copyButton: {
+    padding: 2,
   },
   messagesList: {
     flex: 1,
